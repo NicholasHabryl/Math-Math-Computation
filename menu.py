@@ -1,8 +1,10 @@
 import pygame
 import pygame_menu as pm
 import tkinter as tk
-import games.speedrun
+import games.flashcardmode
+import games.learningmode
 import games.mindthegap
+import games.speedrun
 import utils
 
 #root =tk.Tk()
@@ -29,6 +31,11 @@ def selectnext(useless, args):
 def updatemode(value, mode: str):
     print(utils.MODE[0])
     utils.MODE[0] = mode
+    print(utils.MODE[0])
+
+def updatenum(value, num: int):
+    print(utils.MODE[0])
+    utils.FOCUS_NUM[0] = num
     print(utils.MODE[0])
 
 pygame.init()
@@ -118,7 +125,9 @@ mtgmenu.add.button("Go Back",pm.events.BACK)
 flashmenu.add.selector(
     title = "Pick Modes",
     items= MODES,
-    onreturn= selectnext
+    onchange= updatemode,
+    onreturn= selectnext,
+    selector_id = "modeselect"
 )
 flashmenu.add.selector(
     title = "Pick Number",
@@ -136,15 +145,18 @@ flashmenu.add.selector(
         ("11",11),
         ("12",12)
     ],
+    onchange = updatenum,
     onreturn= selectnext
 )
-flashmenu.add.button("Play!") #when Flashcard is fully developed put the function here
+flashmenu.add.button("Play!",games.flashcardmode.game) #when Flashcard is fully developed put the function here
 flashmenu.add.button("Go Back",pm.events.BACK)
 
 learningmenu.add.selector(
     title = "Pick Modes",
     items= MODES,
-    onreturn= selectnext
+    onchange= updatemode,
+    onreturn= selectnext,
+    selector_id = "modeselect"
 )
 learningmenu.add.selector(
     title = "Pick Number",
@@ -162,9 +174,10 @@ learningmenu.add.selector(
         ("11",11),
         ("12",12)
     ],
+    onchange = updatenum,
     onreturn= selectnext
 )
-learningmenu.add.button("Play!") #when learningmenu is fully developed put the function here
+learningmenu.add.button("Play!",games.learningmode.game) #when learningmenu is fully developed put the function here
 learningmenu.add.button("Go Back",pm.events.BACK)
 
 menu.add.button("Play mode",playmodemenu)
