@@ -1,3 +1,4 @@
+from sre_compile import isstring
 import pygame
 import pygame_menu as pm
 import tkinter as tk
@@ -20,6 +21,11 @@ MODES = [
 #not sure why we need these arguments but it breaks if we dont have them
 def selectnext(useless, args):
     
+    if isstring(args):
+        utils.MODE[0] = args
+    else:
+        utils.FOCUS_NUM[0] = args
+
     curr = menu.get_current()
 
     print("selected is: " + curr.get_widget("modeselect").get_value()[0][1])
