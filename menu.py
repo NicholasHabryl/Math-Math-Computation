@@ -2,6 +2,7 @@ import pygame
 import pygame_menu as pm
 import tkinter as tk
 import games.speedrun
+import games.mindthegap
 import utils
 
 #root =tk.Tk()
@@ -19,15 +20,15 @@ def selectnext(useless, args):
     
     curr = menu.get_current()
 
-    print("selected is: " + curr.get_widget("speedselect").get_value()[0][1])
+    print("selected is: " + curr.get_widget("modeselect").get_value()[0][1])
     if(curr.get_selected_widget()==curr.get_widgets()[1]):
         curr.select_widget(curr.get_widgets()[2])
     else:
         curr.select_widget(curr.get_widgets()[1])
 
-def updatemode(value, difficulty: str):
+def updatemode(value, mode: str):
     print(utils.MODE[0])
-    utils.MODE[0] = difficulty
+    utils.MODE[0] = mode
     print(utils.MODE[0])
 
 pygame.init()
@@ -99,18 +100,19 @@ speedrunmenu.add.selector(
     items= MODES,
     onchange= updatemode,
     onreturn= selectnext,
-    selector_id = "speedselect"
+    selector_id = "modeselect"
 )
-print(speedrunmenu.get_widget("speedselect").get_value()[0][1])
 speedrunmenu.add.button("Play!",games.speedrun.game) #when Speed run is fully developed put the function here
 speedrunmenu.add.button("Go Back",pm.events.BACK)
 
 mtgmenu.add.selector(
     title = "Pick Modes",
     items= MODES,
-    onreturn= selectnext
+    onchange= updatemode,
+    onreturn= selectnext,
+    selector_id = "modeselect"
 )
-mtgmenu.add.button("Play!") #when Mind the Gap is fully developed put the function here
+mtgmenu.add.button("Play!",games.mindthegap.game) #when Mind the Gap is fully developed put the function here
 mtgmenu.add.button("Go Back",pm.events.BACK)
 
 flashmenu.add.selector(

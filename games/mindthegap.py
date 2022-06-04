@@ -1,6 +1,8 @@
 import pygame
 import utils
 
+
+
 from random import randint
 from pygame.locals import ( #many of these K_whatevers can be removed once out of testing
     K_a,
@@ -24,10 +26,13 @@ pygame.font.init()
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
+MODE_MAX = [12]
+MODE_MIN = 0
+
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 TITLE_FONT = pygame.font.SysFont('comicsans',60)
-QUESTION_FONT = pygame.font.SysFont('comicsans',50)
+QUESTION_FONT = pygame.font.SysFont('comicsans',30)
 INFO_FONT = pygame.font.SysFont('comicsans',35)
 
 #the pause menu
@@ -86,6 +91,16 @@ def operation(mode,a,b):
         return a / b
     print("How did you put in a wrong operation?!")
 
+#this sets the maximum for the answer scaling
+def set_MODE_MAX(mode): 
+    if(mode == 'ADD'):
+        MODE_MAX[0] = 24
+        return
+    if(mode == 'MULTI'): 
+        MODE_MAX[0] = 144
+        return
+    print("How did you put in a wrong operation?!")
+
 #check operation is valid
 #no negatives, no fractions/decimals, no dividing by 0
 def check(mode, a, b): 
@@ -109,78 +124,82 @@ def generate(mode):
 
 #TODO instructions
 #draw any updates to the screen
-def draw_screen(mode, first,second,useranswer,userscore,counter):
+def draw_screen(mode,useranswer,userscore,question_list):
     
     
     screen.fill((0,95,170))
     
     titlesurf = pygame.Surface((SCREEN_WIDTH,140)).fill((0,0,0))
     pygame.draw.rect(screen,(0,65,120),titlesurf)
-    title_text = TITLE_FONT.render("Speed Run",1,(255,255,255))
+    title_text = TITLE_FONT.render("Mind the Gap",1,(255,255,255))
     screen.blit(title_text, (SCREEN_WIDTH/2 - title_text.get_width()/2,titlesurf.height/2 -title_text.get_height()/2))
     
-    questionsurf = pygame.Rect(
-        SCREEN_WIDTH*(1/8), #1/8
-        SCREEN_HEIGHT/2 + titlesurf.height/2 - SCREEN_WIDTH*(3/30), #3/32
-        SCREEN_WIDTH*(3/4), #3/4
-        SCREEN_WIDTH*(3/14) #3/16
+    playsurf = pygame.Rect(
+        0,
+        SCREEN_HEIGHT/2 + titlesurf.height/2 - SCREEN_WIDTH*(3/16), 
+        SCREEN_WIDTH,
+        SCREEN_WIDTH*(3/8) 
         )
-    firstrect= pygame.Rect(
-        SCREEN_WIDTH*(1/8),
-        SCREEN_HEIGHT/2 + titlesurf.height/2 - SCREEN_WIDTH*(3/30),
-        SCREEN_WIDTH*(3/16),
-        SCREEN_WIDTH*(3/14) #3/16
-    )
-    moderect= pygame.Rect(
-        SCREEN_WIDTH*(1/8) + firstrect.width,
-        SCREEN_HEIGHT/2 + titlesurf.height/2 - SCREEN_WIDTH*(3/30),
-        SCREEN_WIDTH*(3/32),
-        SCREEN_WIDTH*(3/14) #3/16
-    )
-    secondrect= pygame.Rect(
-        SCREEN_WIDTH*(1/8) + firstrect.width + moderect.width,
-        SCREEN_HEIGHT/2 + titlesurf.height/2 - SCREEN_WIDTH*(3/30),
-        SCREEN_WIDTH*(3/16),
-        SCREEN_WIDTH*(3/14) #3/16
-    )
-    answerrect= pygame.Rect(
-        SCREEN_WIDTH*(1/8) + 2*firstrect.width + 2*moderect.width,
-        SCREEN_HEIGHT/2 + titlesurf.height/2 - SCREEN_WIDTH*(3/30),
-        SCREEN_WIDTH*(3/16),
-        SCREEN_WIDTH*(3/14) #3/16
-    )
-    #pygame.draw.rect(screen,(255,255,255),questionsurf)
-    pygame.draw.rect(screen,(230,230,230),firstrect)
-    pygame.draw.rect(screen,(230,230,230),moderect)
-    pygame.draw.rect(screen,(230,230,230),secondrect)
-    pygame.draw.rect(screen,(230,230,230),answerrect)
+    pygame.draw.rect(screen,(255,255,255),playsurf)
 
-    first_text = QUESTION_FONT.render(str(first),1,(0,0,0))
-    modetext = 0
-    if(mode == 'ADD'):
-        modetext = QUESTION_FONT.render('+',1,(0,0,0))
-    elif(mode == 'SUB'):
-        modetext = QUESTION_FONT.render('-',1,(0,0,0))
-    elif(mode == 'MULTI'):
-        modetext = QUESTION_FONT.render('x',1,(0,0,0))
-    elif(mode == 'DIV'):
-        modetext = QUESTION_FONT.render(chr(247),1,(0,0,0))
-    else: 
-        print(" invalid mode: "+ str(mode))
-        exit()
-    second_text = QUESTION_FONT.render(str(second),1,(0,0,0))
-    answer_text = QUESTION_FONT.render(str(useranswer),1,(0,0,0))
+    for bar in question_list:
+        newbar = pygame.Rect(
+            bar[0],
+            SCREEN_HEIGHT/2 + 70 - SCREEN_WIDTH*(3/16), 
+            40,
+            SCREEN_WIDTH*(3/8)
+        )            
+        pygame.draw.rect(screen,(0,190,0),newbar)
 
-    screen.blit(first_text, (firstrect.x + firstrect.width/2 - first_text.get_width()/2,firstrect.y + firstrect.height/2 - first_text.get_height()/2 ))
-    screen.blit(modetext, (moderect.x + moderect.width/2 - modetext.get_width()/2,moderect.y + moderect.height/2 - modetext.get_height()/2 ))
-    screen.blit(second_text, (secondrect.x + secondrect.width/2 - second_text.get_width()/2,secondrect.y + secondrect.height/2 - second_text.get_height()/2 ))
-    screen.blit(answer_text, (answerrect.x + answerrect.width/2 - answer_text.get_width()/2,answerrect.y + answerrect.height/2 - answer_text.get_height()/2 ))
+        answer = operation(mode,bar[1],bar[2])
+        
+        answer_cube = pygame.Rect(
+            bar[0],
+            newbar.top + ((SCREEN_WIDTH*(3/8)-60)*(MODE_MAX[0]-answer)/MODE_MAX[0]),    #scaling algorithm
+            40,
+            60
+        )   
+        pygame.draw.rect(screen,(255,255,255),answer_cube)   #same color as background
+        #display each question    
+        if(mode == 'ADD'):
+            question = str(bar[1]) + " + " +str(bar[2])
+        if(mode =='SUB'): 
+            question = str(bar[1]) + " - " +str(bar[2])
+        if(mode == 'MULTI'): 
+            question = str(bar[1]) + " x " +str(bar[2])
+        if(mode == 'DIV'): 
+            question = str(bar[1]) + " " + chr(247) + " " + str(bar[2])
+        question_text = QUESTION_FONT.render(question,1,(0,0,0))
+        screen.blit(question_text,(newbar.centerx - question_text.get_width()/2 ,newbar.bottom))
+
+
+    ua_cube = pygame.Rect(
+        SCREEN_WIDTH*(3/16),
+        playsurf.top + ((SCREEN_WIDTH*(3/8)-60)*(MODE_MAX[0]-useranswer)/MODE_MAX[0]) +10,
+        40,
+        40
+    )
+    pygame.draw.rect(screen,(255,0,0),ua_cube)
+    useranswer_text = QUESTION_FONT.render(str(useranswer),1,(0,0,0))
+    screen.blit(useranswer_text,(ua_cube.centerx - useranswer_text.get_width()/2,ua_cube.centery - useranswer_text.get_height()/2))
+    # first_text = QUESTION_FONT.render(str(first),1,(0,0,0))
+    # modetext = 0
+    # if(mode == 'ADD'):
+    #     modetext = QUESTION_FONT.render('+',1,(0,0,0))
+    # elif(mode == 'SUB'):
+    #     modetext = QUESTION_FONT.render('-',1,(0,0,0))
+    # elif(mode == 'MULTI'):
+    #     modetext = QUESTION_FONT.render('x',1,(0,0,0))
+    # elif(mode == 'DIV'):
+    #     modetext = QUESTION_FONT.render(chr(247),1,(0,0,0))
+    # else: 
+    #     print(" invalid mode: "+ str(mode))
+    #     exit()
+    # second_text = QUESTION_FONT.render(str(second),1,(0,0,0))
+    # answer_text = QUESTION_FONT.render(str(useranswer),1,(0,0,0))
 
     score_text = INFO_FONT.render("Score: "+ str(userscore),1,(0,0,0))
-    screen.blit(score_text,(30,titlesurf.height + 30))
-
-    time_text = INFO_FONT.render("Time remaining: "+str(counter),1,(0,0,0))
-    screen.blit(time_text,(SCREEN_WIDTH - 30 -time_text.get_width(),titlesurf.height + 30))
+    screen.blit(score_text,(30,titlesurf.height + 15))
 
     # Update the display
     pygame.display.flip()
@@ -188,22 +207,26 @@ def draw_screen(mode, first,second,useranswer,userscore,counter):
 #this will eventually contain everything
 def game():
 
-    # curr = menu.get_current()
-    # mode = curr.get_widget("speedselect").get_value()[0][1]
-    print("why father: " + utils.MODE[0])
+    
     mode = utils.MODE[0]
+    set_MODE_MAX(mode)
+
     #initialize game
     pygame.init()
 
     running = True
 
-    first , second = generate(mode)
+    #first , second = generate(mode)
     useranswer = 0
     userscore = 0
+    question_list = []  #this will store the x position of the bar as well as the number in the equation
+
+    first , second = generate(mode)
+    question_list.append([SCREEN_WIDTH-60,first,second])
 
     clock = pygame.time.Clock()
-    counter = 60
-    pygame.time.set_timer(pygame.USEREVENT,1000)
+    counter = 0
+    pygame.time.set_timer(pygame.USEREVENT,100)     #1000 would be 1 sec
 
     while running:
         # for loop through the event queue
@@ -217,12 +240,6 @@ def game():
                 #for the sake of testing, we will be using keys
                 #once we get everything hooked up, this will have to receive inputs from the USB port
 
-                elif event.key == K_w:  #the enter pad
-                    if (operation(mode,first,second)==useranswer):
-                        first , second = generate(mode)
-                        useranswer = 0
-                        userscore = userscore + 1
-                        #TODO: say it was correct, display graphics, say wrong is wrong
                 elif event.key == K_z:  #the -10 pad
                     useranswer -= 10
                     if(useranswer < 0 ): 
@@ -242,17 +259,33 @@ def game():
                     if not running:
                         continue
             if event.type == pygame.USEREVENT:
-                counter -= 1                
+                #if there is a bar already on the screen, then move it
+                if question_list:
+                    for bar in question_list:
+                        bar[0] -= 4
+
+                #number in the if statement should be 10x the amount of seconds
+                if counter % 70 ==0 and counter != 0: 
+                    #generate new bar here
+                    first , second = generate(mode)
+                    question_list.append([SCREEN_WIDTH-60,first,second])
+
+
+                counter += 1 
 
             # Check for QUIT event. If QUIT, then set running to false.
             elif event.type == QUIT:
                 running = False
 
-        if counter <= 0 :
-            running = end_menu(userscore)
-            continue
+            if question_list[0][0] < (SCREEN_WIDTH*(3/16) + 35):    #if the leftmost bar reaches the answer cube
+                if useranswer == operation(mode, question_list[0][1],question_list[0][2]):
+                    userscore += 1
+                    question_list.pop(0)
+                else:
+                    running = end_menu(userscore)
+                    continue
 
-        draw_screen(mode,first,second,useranswer,userscore,counter)
+        draw_screen(mode,useranswer,userscore,question_list)
         clock.tick(60)
 
     #probably dont want to call this as it might end the menu too
