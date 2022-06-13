@@ -1,4 +1,5 @@
 import pygame
+from sqlalchemy import TIME
 import utils
 
 
@@ -28,6 +29,8 @@ SCREEN_HEIGHT = 600
 
 MODE_MAX = [12]
 MODE_MIN = 0
+
+TIME_RANGE = [70]
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
@@ -186,21 +189,6 @@ def draw_screen(mode,useranswer,userscore,question_list):
     pygame.draw.rect(screen,(255,0,0),ua_cube)
     useranswer_text = QUESTION_FONT.render(str(useranswer),1,(0,0,0))
     screen.blit(useranswer_text,(ua_cube.centerx - useranswer_text.get_width()/2,ua_cube.centery - useranswer_text.get_height()/2))
-    # first_text = QUESTION_FONT.render(str(first),1,(0,0,0))
-    # modetext = 0
-    # if(mode == 'ADD'):
-    #     modetext = QUESTION_FONT.render('+',1,(0,0,0))
-    # elif(mode == 'SUB'):
-    #     modetext = QUESTION_FONT.render('-',1,(0,0,0))
-    # elif(mode == 'MULTI'):
-    #     modetext = QUESTION_FONT.render('x',1,(0,0,0))
-    # elif(mode == 'DIV'):
-    #     modetext = QUESTION_FONT.render(chr(247),1,(0,0,0))
-    # else: 
-    #     print(" invalid mode: "+ str(mode))
-    #     exit()
-    # second_text = QUESTION_FONT.render(str(second),1,(0,0,0))
-    # answer_text = QUESTION_FONT.render(str(useranswer),1,(0,0,0))
 
     score_text = INFO_FONT.render("Score: "+ str(userscore),1,(0,0,0))
     screen.blit(score_text,(30,titlesurf.height + 15))
@@ -273,10 +261,14 @@ def game():
                         bar[0] -= 4
 
                 #number in the if statement should be 10x the amount of seconds
-                if counter % 70 ==0 and counter != 0: 
+                if counter % TIME_RANGE[0] ==0 and counter != 0: 
                     #generate new bar here
                     first , second = generate(mode)
                     question_list.append([SCREEN_WIDTH-60,first,second])
+                    counter = 0 
+                    TIME_RANGE[0] -= 3
+                    if TIME_RANGE[0] < 30:
+                        TIME_RANGE[0] = 30
 
 
                 counter += 1 
