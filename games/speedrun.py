@@ -94,17 +94,26 @@ def check(mode, a, b):
     if(mode == 'DIV' and a%b!=0): return False
     return True
 
-#TODO update division algorithm
 #create a valid operation
 def generate(mode):
     a , b = 0 , 0
     while(1):
         a = randint(0,12)
         b = randint(0,12)
+        if mode == "SUB":
+            a += b
+        if mode == "DIV":
+            a *= b
         if(check(mode,a,b)):
             break
     return a , b
 
+#this function calculates the score on a correct question
+def calc_score(question_generated, currtime):
+    score = 100 - 9*(question_generated-currtime)
+    if score < 10:
+        return 10
+    return score   
 
 
 #TODO instructions
@@ -203,6 +212,7 @@ def game():
 
     clock = pygame.time.Clock()
     counter = 60
+    question_generated = counter
     pygame.time.set_timer(pygame.USEREVENT,1000)
 
     while running:
@@ -221,7 +231,8 @@ def game():
                     if (operation(mode,first,second)==useranswer):
                         first , second = generate(mode)
                         useranswer = 0
-                        userscore = userscore + 1
+                        userscore = userscore + calc_score(question_generated,counter)
+                        question_generated = counter
                         #TODO: say it was correct, display graphics, say wrong is wrong
                 elif event.key == K_z:  #the -10 pad
                     useranswer -= 10

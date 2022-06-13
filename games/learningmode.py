@@ -82,6 +82,10 @@ def generate(mode,b):
     a  = 0 
     while(1):
         a = randint(0,12)
+        if mode == "SUB":
+            a += b
+        if mode == "DIV":
+            a *= b
         if(check(mode,a,b)):
             break
     return a 

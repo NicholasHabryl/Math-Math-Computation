@@ -116,6 +116,10 @@ def generate(mode):
     while(1):
         a = randint(0,12)
         b = randint(0,12)
+        if mode == "SUB":
+            a += b
+        if mode == "DIV":
+            a *= b
         if(check(mode,a,b)):
             break
     return a , b
@@ -250,8 +254,12 @@ def game():
                         useranswer = 0
                 elif event.key == K_a:  #the +10 pad
                     useranswer += 10
+                    if useranswer > MODE_MAX[0]:
+                        useranswer = MODE_MAX[0]
                 elif event.key == K_d:  #the +1 pad
                     useranswer += 1
+                    if useranswer > MODE_MAX[0]:
+                        useranswer = MODE_MAX[0]
                 elif event.key == K_x:  #the clear pad
                     useranswer = 0
                 elif event.key == K_e:  #the pause pad
