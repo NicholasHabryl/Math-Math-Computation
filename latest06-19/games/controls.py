@@ -1,0 +1,9 @@
+# Declaring controls 
+arrowEnter = "1\n"
+arrowClear = "2\n"
+arrowPlusTen = "3\n"
+arrowMinsTen = "4\n"
+arrowPlusOne = "5\n"
+arrowMinsOne = "6\n"
+arrowMenu = "7\n"
+arrowPause = "8\n"
